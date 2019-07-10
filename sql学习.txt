@@ -1,0 +1,510 @@
+###所有语句不区分大小写
+
+
+##SQL中的注释语句   ——和一个回车或者# 
+
+
+
+
+
+
+
+show databases;
+
+use dbname;
+
+show tables;
+
+create table tablename(填东西);
+
+show create table tablename; ##查看表的内部结构
+
+create index #indexname on #tablename（name表中字段）; ##添加索引名
+
+drop index #indexname on tablename;
+
+alter table #tablename add index #indexname(name表中字段) ##另一种添加索引名称的方法
+
+alter table #tablename add primary key name;
+
+explain id from #tablename where #condition;
+
+1.数据库操作
+
+一.关于创建
+
+###创建数据库并且判断其是否存在，并且指定字符集
+
+create database if not exists 数据库名 character set （gbk/utf8）    #utf8没有-
+
+二.关于查询
+
+show
+
+三.关于更改
+
+##修改数据库的名称
+
+alter database 数据库名称 character set 字符集名称
+
+四.关于删除
+
+##删除数据库
+
+drop database 数据库名称
+
+五.关于查询数据库
+查询数据库
+查询正在使用的数据库
+
+select database()
+
+
+2.操作表增、删、改、查
+
+一.查询
+#查询数据库中的而所有表名称
+show tables
+#查询表结构
+desc 表名
+
+二.创建
+create table 表名（
+           列名）
+
+这个其中关于时间数据类型的问题
+ date
+datetime
+timestamp
+
+三.删除表的名称
+drop table 表的名称
+
+四.复制表
+create table 新的表名 like 需要复制的表名 
+
+五.修改update操作
+
+修改表的名称
+alter table 表名 rename to 新的表名
+
+修改表的字符集
+先查看  show create table 表名；
+修改字符集 alter table 表名 character set 字符集
+
+
+修改列的名称、类型
+#增加列 alter table 表名 add 列名 数据类型
+#修改列 alter table 表名 change 列名 新列名 数据类型
+
+删除列
+alter table 表名 drop 列名
+
+
+
+3.增删该表中数据
+一.添加数据
+insert into 表名（列名1，列名2...列名n） values（值1，值2.....值n）
+
+insert into 表名 values(变量数量要与表中现有的数量全部一一对应)
+
+
+二.删除数据
+delete from 表名[where 条件]
+如果不写条件，表中的所有记录都全部会被删除，不推荐
+
+推荐使用 truncate table 先删除表，再创建一个一模一样的表
+
+三.修改数据
+update 表名 set 列名1=值1，列名2=值2，.....[where 条件]
+注意：如果不加任何条件，那么将会将表中的所有记录全部改变
+
+
+4.查询表中的记录
+一.语法
+select
+	字段列表
+from
+	表名列表
+where
+	条件列表
+group by
+	分组字段
+having
+	分组之后的操作
+order by
+	排序
+limit
+	分页限定
+
+二.基础查询
+select * from 表名
+
+一.多个字段查询
+select 列名1，列名2 from 表名   返回查询列结果值
+
+二.去除重复
+select distinct 列名 from 表名  返回独一无二的查询结果值
+
+三.计算列
+求和：
+select name,math,english,math + ifnull（english,0) as 新列名 from 表名   数值型的四则运算都可以
+
+四.起别名
+
+
+三.条件查询
+	1.where子句后跟条件
+	2.运算符
+	  >、<、>=、<=、=        #等于只有一个等号
+	3.between....and
+	4.in(集合）
+	5.like:模糊查询
+		占位符：_:单个字符
+			%：多个字符占位符
+	6.is null
+	7.and 或者&&
+	8.or 或者 ||
+	9.not 或者 ！
+	 
+查询名字中第一个字是马的人
+select * from table where like '马%'；
+
+查询名字中第二个字是化的人
+select * from table where like '_化%'；
+
+查询名字是包含马字的名字
+select * from table where like '%马%'；
+
+查询名字是三个字的人
+select * from table where like '___';  #三个占位符
+
+##年龄在20到30之间
+select * from table where age>=20 and age <=30;
+或者：
+select * from table where age between 20 and 30;
+
+##年龄是20、18和25岁
+select * from table where age = 20 or age = 18 or age = 25
+select * from table where age in (20,18,25)
+
+##null值不能使用=号去判断
+select * from table where English is null；
+
+select * from table where english is not null;
+
+
+
+
+四.查询语句
+	*排序查询
+      #语法
+	order by 子句
+	order by 排序字段1 排序方式   排序字段2 排序方式
+select * from table order by math asc(升序，默认) desc(降序)
+
+数学成绩一样按照英语成绩排序
+select * from table order by math asc，English asc;
+有多个排序条件当第一个条件一样才会去判断第二个条件
+
+	*聚合函数
+     #主要是做纵向计算的
+	count
+select count(name) from table;    注意：聚合函数会排除非空的数据
+处理这一个问题 
+select count(ifnull(name)) from table
+select count(*) from table 或者 count（id）
+
+	max
+select max(math) from table
+
+	min
+select min(math) from table
+
+	sum
+select sum(math) from table
+
+	avg
+select avg(math) from table
+
+
+
+	*分组查询
+select sex,avg(math) from 表名 group by sex
+
+select sex,avg(math),count(id) from 表名 by sex
+
+#分组之前限定分组的条件，分数低于70分不参与
+select sex，avg(math) from 表名 where math>70 group by sex
+#分组之前限定分组的条件，分数低于70分不参与,分组之后组人数要大于2个人
+select sex，avg(math) from 表名 where math>70 group by sex having count（id)>2
+
+
+##where 和 having之间的区别
+
+#where在分组之前进行限定；having在分组之后
+#where后面不可以加聚合函数；having后面可以使用聚合函数
+
+
+	*分页查询
+	*语法：limit 开始的索引，分隔的数目
+
+select * from 表名 limit 0,3；分页操作只适合MySQL的分页规则
+
+
+
+*约束
+
+
+对表中的数据进行限定，从而保证数据的正确性
+	主键约束
+
+	注意：1.含义非空且唯一
+	      2.一张表只能有一个字段为主键
+	      3.主键就是表中的唯一标识
+#删除主键
+alter table 表名 drop primary key;
+
+alter table 表名 id int primary key;
+
+#主键自动增长
+
+create table 表名（
+	id int primary key auto_increment,
+	name varchar（20） unique
+）   ##自动增长跟上一条记录有关
+
+##删除自动增长
+alter table 表名 modify id int;
+##添加主键自动增长
+alter table 表名 modify id int auto_increment;
+
+
+
+	非空约束  
+create table 表名（
+	id int,
+	name varchar（20） not null
+）   ##创建表的约束
+
+alter table 表名 change name varchar(20) not null;
+ 
+	唯一约束
+##表示值不能重复
+create table 表名（
+	id int,
+	name varchar（20） unique
+）
+alter table 表名 drop index 列名
+alter table 表名 modify 列名 varchar（20） unique；
+
+
+
+	外键约束
+	——关于数据冗余
+	——进行表的拆分
+
+*在创建表时可以添加外键
+	语法：
+	create table 表名（
+		......
+		外键列
+		constraint 外键名称 foreign key (外键列名称) references 主表名（主表列名称）
+）
+
+	删除外键
+alter table 表名 drop foreign key 外键名称
+
+alter table 表名 add constraint 外键名称 foreign key (外键列名称) references 主表名（主表列名称）
+
+
+级联操作
+alter table 表名 add constraint 外键名称 foreign key (外键列名称) references 主表名（主表列名称）on update cascade;
+		##级联删除		on delete cascade
+
+
+
+
+
+
+###数据库的设计
+	1.多表之间的关系
+		一对一的关系
+		例如人和身份证
+任意一方添加唯一外键指向另一方的主键，一般合成一张表
+	2.一对多（多对一）
+		例如一个部门有多个员工，一个员工只能对应一个部门
+
+ 	3.多对多
+		例如一个学生可以选择多门课程，一个课程也可以被多个学生选择
+实现方式：多对多的关系实现需要借助第三张中间表。中间表至少包含两个字段，这两个字段作为第三张表的外键，分别指向两张表的主键
+
+
+三大范式
+分类
+	第一范式：每一列都是不可分割的原子数据项
+	第二范式：在1fs的基础上，非码属性必须完全依赖候选码
+	第三范式：在2fs的基础上，任何非主属性不依赖于其他非主属性
+
+
+
+数据库的备份和还原
+	1.命令行的方式
+	语法:
+	*备份：mysqldump -u用户名 -p密码 数据库名称 >保存的路径
+        *还原：create 数据库
+               source 路径
+
+
+
+
+##多表查询
+      select * from 表1，表2   #笛卡尔积  消除无用笛卡尔积
+	
+	*内连接查询
+	1.隐式内连接
+	select * from emp,dpt where dptid=dpt_id
+	2.显式内连接
+	select *from emp inner join dept on empt.id = dept.id
+	
+	*外连接查询
+1.左外连接
+select 字段列表 from 表1 left join 表2 on 条件
+
+	select
+	t1.* ,t2.name
+
+	from
+	emp t1 left join dept t2      
+
+	on
+	t1.dept_id = t2.id
+
+2.右外连接
+	right join  on 
+
+
+	*子查询
+*查询员工工资小于平均工资的人
+select * from emp where emp.salary =(select max(salary) from emp)
+*查询财务部和市场部所有员工的信息
+select * from emp where dept_id in (select id from dept where name = '财务部" or name = "市场部"）；
+*查询员工入职日期是2011-11-11日之后的员工信息和部门信息
+
+select * from dept t1,(select * from emp where emp.join_data >'2011-11-11') t2 where t1.id = t2.dept_id;
+
+      
+###关于事务
+1.开启事务
+start transaction
+
+2.回滚
+rollback
+
+3.提交
+commit
+
+事务的存在是为了让提交语句变成一个整体防止出现某一个问题，导致整一个模块代码失效
+
+如果不开启事务
+那么MySQL会自动提交事务
+    MySQL就是自动提交的，一条DML语句会自动提交一次语句
+
+
+*修改事务的默认打开方式
+	*查看事务的默认提交方式：select @@autocommit； --1 代表自动提交 0代表手动提交
+	*修改默认提交方式：set@@autocommit = 0
+
+oracle 数据库默认是手动提交的
+
+
+
+4.事务的四大特征
+	1.原子性：是不可分割的最小操作单位，要么同时成功，要么同时失败
+	2.持久性：当事务提交或回滚后，数据库会持久化的保存数据
+	3.隔离性：多个事务之间相互独立
+	4.一致性：事务操作前后，数据总量不变
+
+
+数据的隔离级别
+	*概念：多个事务之间隔离的，相互独立的，但是如果多个事务操作同一批数据，则会引发一些问题，设置不同隔离级别就可以解决这些问题
+	存在问题
+	1.脏读：一个事务，读取到另一个事务中没有提交的数据
+	2.不可重复读(虚读)：在同一个事务中，两次读取到 的事务不一样
+	3.幻读：一个事务操作数据表中的所有记录，另一个事务添加了一条事务，则另一个事务查询不到自己的修改
+
+
+1.read uncommitted：读未提交
+	*产生的问题：脏读，不可重复读，幻读
+2.read committed:读已提交
+	*产生的问题:不可重复读、幻读
+3.repeatable read：可重复读
+	*产生的问题：幻读
+4.serialization:串行化    #相当于一个锁表的操作
+
+	*可以解决所有的问题
+
+隔离级别从小到大安全问题越来越高，但是效率越来越低
+
+set global transaction isolation level 级别字符串；
+
+
+MySQL 默认是repeatable read 不用特别去修改
+
+##DCL管理用户，授权
+ ##管理用户，授权
+1.管理用户
+	1.添加用户
+	2.删除用户 :drop user '用户名'@‘localhost’
+	3.修改用户密码
+	update user set password = password("新密码") where user = ‘用户名’
+	4.查询用户
+		1：切换到MySQL数据库 use user;
+		create user '用户名'@‘localhost’identified by '123'
+		create user '用户名'@‘%’ identified by '123';
+
+
+2.授权
+
+MySQL中忘记了root密码怎么办？
+
+cmd --net stop mysql 停掉MySQL服务
+使用无验证方式启动MySQL：myslq --skip-grant-tables
+
+use mysql
+
+修改密码
+关闭两个窗口
+打开任务管理器，手动结束MySQL.EXE进程
+再打开
+
+
+
+3.权限
+1.查询权限
+show grants for '用户名'@‘主机名’
+2.授予权限
+grant 权限列表 on 数据库.表名 to '用户名'@‘主机名’
+
+grant select，delete，update on db3.account to 'lisi'@'%'
+
+garnt all on *.* to 'zhangsan'@'localhost'
+
+	 
+撤销权限
+revoke 权限列表 on 数据库名.表名 from 'zhangsan'@'localhost'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
